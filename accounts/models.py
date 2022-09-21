@@ -53,11 +53,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    RESTAURANT = 1
+    VENDOR = 1
     CUSTOMER = 2
 
     ROLE_CHOICE = (
-        (RESTAURANT, 'Restaurant'),
+        (VENDOR, 'Vendor'),
         (CUSTOMER, 'Customer'),
     )    
     #    It consist of all the fields like first_name, last_name etc
