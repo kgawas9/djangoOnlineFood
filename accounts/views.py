@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
-
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 # custom models
 from .models import User, UserProfile
@@ -112,7 +113,21 @@ def register_vendor(request):
 
 def activate_account(request, uidb64, token):
     # to activaet the user by setting is_active to true
-    return
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, "Congratulations, your accounts is activated..")
+        return redirect('my_account')
+
+    messages.error(request, "Something went wrong, Invalid request..")
+    return redirect('login')
 
 
 def login(request):
