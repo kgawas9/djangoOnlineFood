@@ -150,6 +150,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Messages
 from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
-    messages.INFO: '',
+    messages.INFO: 'info',
     messages.ERROR: 'danger',
 }
+
+
+
+# SMPT configuration details
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config('HOST_USER')
+EMAIL_HOST_PASSWORD = config('HOST_PASSWORD')
+EMAIL_USE_TLS = True

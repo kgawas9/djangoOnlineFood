@@ -4,13 +4,15 @@
     <div class="main-section">
         <div class="jumbotron jumbotron-fluid">
             <div class="container">
-            <h1 class="display-4 text-danger">Unauthorized user</h1>
-            {% if user.role == 2 %}
-                <p class="lead">You are not authorized to view this page.. If you are vendor, please <a href="{% url 'logout' %}">logout</a> and login as vendor</p>
-            {% else %}
-                <p class="lead">You are not authorized to view this page.. If you are customer, please <a href="{% url 'logout' %}">logout</a> and login as customer</p>
-            {% endif %}
-            </div>
+                <h1 class="display-4 text-danger">Unauthorized user</h1>
+                
+                {% if user.role == 2 %}
+                    <p class="lead"><strong>You are not authorized to view this page.. If you are vendor, please <a href="{% url 'logout' %}">logout</a> and login as vendor</strong></p>
+                {% else %}
+                    <p class="lead"><strong>You are not authorized to view this page.. If you are customer, please <a href="{% url 'logout' %}">logout</a> and login as customer</strong></p>
+                {% endif %}
+                
+            </div>    
         </div>
     </div>
 {% endblock content %}

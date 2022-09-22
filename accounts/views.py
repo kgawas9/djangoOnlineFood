@@ -1,28 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import PermissionDenied
+
 
 # custom models
 from .models import User, UserProfile
 from .forms import UserForm
 from vendor.forms import VendorForm
-from .utils import detectUser
-
-
-# Restrict the vendor from accessing customer page
-def is_role_vendor(user):
-    if user.role == 1:
-        return True
-    else:
-        raise PermissionDenied
-
-# Restrict the customer from accessing vendor page 
-def is_role_customer(user):
-    if user.role == 2:
-        return True
-    else:
-        raise PermissionDenied
+from .utils import detectUser, send_verification_email
+from .decorators import is_role_vendor, is_role_customer
 
 
 # Create your views here.
@@ -65,6 +51,10 @@ def register_user(request):
 
             user.role = User.CUSTOMER
             user.save()
+
+            # Send verification email
+            send_verification_email(request, user)
+
             messages.success(request, "Your account has been registered successfully, the verification link has sent to your registered email id. please activate your account")
             return redirect('register_user')
 
@@ -104,6 +94,9 @@ def register_vendor(request):
             vendor.user_profile = user_profile
             vendor.save()
 
+            # Send verification email
+            send_verification_email(request, user)
+
             messages.success(request, "Your account has been registered successfully, please wait for the approval..")
             return redirect('register_vendor')
 
@@ -116,6 +109,10 @@ def register_vendor(request):
     }
     return render(request, 'accounts/register_vendor.html', context=context)
 
+
+def activate_account(request, uidb64, token):
+    # to activaet the user by setting is_active to true
+    return
 
 
 def login(request):
