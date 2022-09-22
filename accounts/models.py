@@ -104,6 +104,16 @@ class User(AbstractBaseUser):
         return True
 
 
+    def get_role(self):
+        if self.role == 1:
+            user_role = 'Vendor'
+            
+        elif self.role == 2:
+            user_role = 'Customer'
+            
+        return user_role
+
+
 class UserProfile(models.Model):
     # models.CASCADE - to decide what action needs to be taken if users are deleted
     # models.CASCADE - if user deleted from system the profile also will be deleted

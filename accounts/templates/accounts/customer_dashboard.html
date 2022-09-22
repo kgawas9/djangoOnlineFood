@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h5>Customer dashboard</h5>
+    {{ user.username }}
+    <h4>This s a {{ user.get_role }}</h4>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <!-- Load messages -->
+            {% include 'includes/alerts.html' %}
+        </div>
+    </div>
+{% endblock content %}

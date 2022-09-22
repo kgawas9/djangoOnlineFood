@@ -1,12 +1,19 @@
-from django.shortcuts import render, HttpResponse, redirect
-from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib import messages, auth
+from django.contrib.auth.decorators import login_required
+
 # custom models
 from .models import User, UserProfile
 from .forms import UserForm
 from vendor.forms import VendorForm
+from .utils import detectUser
 
 # Create your views here.
 def register_user(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "You are already logged in..")
+        return redirect('my_account')
+
     if request.method == 'POST':
         form = UserForm(request.POST)
         
@@ -54,6 +61,10 @@ def register_user(request):
 
 
 def register_vendor(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "You are already logged in..")
+        return redirect('my_account')
+
     if request.method == 'POST':
         user_form = UserForm(request.POST)
         # To receive the file
@@ -61,7 +72,11 @@ def register_vendor(request):
 
         if user_form.is_valid() and vendor_form.is_valid():
             user = user_form.save(commit=False)
-            user.set_password = user_form.cleaned_data['password']
+            
+            # password = user_form.cleaned_data['password']
+            # print(password)
+            
+            user.set_password(user_form.cleaned_data['password'])
             user.role = User.VENDOR
             user.save()
 
@@ -83,3 +98,59 @@ def register_vendor(request):
         'v_form': vendor_form,
     }
     return render(request, 'accounts/register_vendor.html', context=context)
+
+
+
+def login(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "You are already logged in..")
+        return redirect('my_account')
+
+    if request.method == 'POST':
+        email_id = request.POST['email']
+        user_password = request.POST['password']
+
+        if not email_id or not user_password:
+            messages.error(request, 'Email id or password should not be blank..')
+            return redirect('login')
+        
+        else:
+            user = auth.authenticate(email=email_id, password = user_password)
+            if user is None:
+                messages.error(request, 'User not found, please verify your credentials')
+                return redirect('login')
+
+            auth.login(request, user)
+            messages.success(request, f'Welcome { user.first_name }, you are now logged in..')
+            return redirect('my_account')
+
+    return render(request, 'accounts/login.html')
+
+
+
+def logout(request):
+    auth.logout(request)
+    messages.info(request, 'You are logged out, see you seen')
+    return redirect('login')
+
+
+
+# once the user will click on my account -
+# 1. user will redirect to my_account view and then check if the user is customer or vendor from utils.py file
+# 2. Then it will redirect to customer account url or vendor account url
+
+@login_required(login_url='login')
+def my_account(request):
+    user = request.user
+    redirect_url = detectUser(user)
+    return redirect(redirect_url)
+
+
+@login_required(login_url='login')
+def customer_dashboard(request):
+    return render(request, 'accounts/customer_dashboard.html')
+
+
+@login_required(login_url='login')
+def vendor_dashboard(request):
+    return render(request, 'accounts/vendor_dashboard.html')
