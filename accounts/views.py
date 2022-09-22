@@ -1,12 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages, auth
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 
 # custom models
 from .models import User, UserProfile
 from .forms import UserForm
 from vendor.forms import VendorForm
 from .utils import detectUser
+
+
+# Restrict the vendor from accessing customer page
+def is_role_vendor(user):
+    if user.role == 1:
+        return True
+    else:
+        raise PermissionDenied
+
+# Restrict the customer from accessing vendor page 
+def is_role_customer(user):
+    if user.role == 2:
+        return True
+    else:
+        raise PermissionDenied
+
 
 # Create your views here.
 def register_user(request):
@@ -147,10 +164,12 @@ def my_account(request):
 
 
 @login_required(login_url='login')
+@user_passes_test(is_role_customer)
 def customer_dashboard(request):
     return render(request, 'accounts/customer_dashboard.html')
 
 
 @login_required(login_url='login')
+@user_passes_test(is_role_vendor)
 def vendor_dashboard(request):
     return render(request, 'accounts/vendor_dashboard.html')
