@@ -54,7 +54,10 @@ def register_user(request):
             user.save()
 
             # Send verification email
-            send_verification_email(request, user)
+            email_subject = 'Confirm E-mail Address'
+            email_template = 'accounts/emails/account_verification_email.html'
+            
+            send_verification_email(request, user, email_subject, email_template)
 
             messages.success(request, "Your account has been registered successfully, the verification link has sent to your registered email id. please activate your account")
             return redirect('register_user')
@@ -96,7 +99,10 @@ def register_vendor(request):
             vendor.save()
 
             # Send verification email
-            send_verification_email(request, user)
+            email_subject = 'Confirm E-mail Address'
+            email_template = 'accounts/emails/account_verification_email.html'
+            
+            send_verification_email(request, user, email_subject, email_template)
 
             messages.success(request, "Your account has been registered successfully, please wait for the approval..")
             return redirect('register_vendor')
@@ -162,6 +168,68 @@ def logout(request):
     messages.info(request, 'You are logged out, see you seen')
     return redirect('login')
 
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+
+        if not email:
+            messages.error(request, 'Please enter your email address to continue..')
+            return redirect('forgot_password')
+
+        if not User.objects.filter(email=email).exists():
+            messages.error(request, f'User with email id {email} is not exist, please verify your email id..')
+            return redirect('forgot_password')
+
+        # send an email verification link to reset the password
+        user = User.objects.get(email__exact=email)
+
+        email_subject = 'Reset Your Password'
+        email_template = 'accounts/emails/reset_password_email.html'
+        send_verification_email(request, user, email_subject, email_template)
+
+        messages.success(request, "Password reset link has been sent to your email address..")
+        return redirect('forgot_password')
+
+    return render(request, 'accounts/forgot_password.html')
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+
+        if password != confirm_password:
+            messages.error(request, 'Password and confirm password does not matched..')
+            return redirect('reset_password')
+        
+        # to get the user id from session
+        user_id = request.session.get('uid')
+        user = User.objects.get(pk=user_id)
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+        messages.success(request, "Your password has reset successfully, you may login to your account now")
+        return redirect('login')
+        
+    return render(request, 'accounts/reset_password.html')
+
+def reset_password_validate(request, uidb64, token):
+    # validate user by decoding the token and user pk
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        request.session['uid'] = uid
+        messages.info(request, 'Please reset your password')
+        return redirect('reset_password')
+
+    messages.error(request, "Something went wrong, Invalid request..")
+    return redirect('login')
 
 
 # once the user will click on my account -

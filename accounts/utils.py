@@ -19,17 +19,39 @@ def detectUser(user):
     return redirect_url
 
 
-def send_verification_email(request, user):
+# def asend_verification_email(request, user):
+#     # we need use the current site due to local host and post deployment site
+
+#     # About autoescape off
+#     # autoescape from email template trust the values from where its coming 
+#     # and you are safe agains the cross site scripting 
+
+#     current_site = get_current_site(request)
+#     from_email = settings.DEFAULT_FROM_EMAIL
+#     email_subject = 'foodOnline - Confirm E-mail Address'
+#     message = render_to_string('accounts/emails/account_verification_email.html', {
+#         'user': user,
+#         'domain': current_site,
+#         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+#         'token': default_token_generator.make_token(user),
+#     })
+
+#     to_email = user.email
+#     mail = EmailMessage(email_subject, message, from_email, to=(to_email,))
+#     mail.send()
+
+
+def send_verification_email(request, user, email_subject, email_template):
     # we need use the current site due to local host and post deployment site
 
     # About autoescape off
     # autoescape from email template trust the values from where its coming 
     # and you are safe agains the cross site scripting 
-
+    
     current_site = get_current_site(request)
     from_email = settings.DEFAULT_FROM_EMAIL
-    email_subject = 'foodOnline - Confirm E-mail Address'
-    message = render_to_string('accounts/emails/account_verification_email.html', {
+    email_subject = f'foodOnline - { email_subject }'
+    message = render_to_string(email_template, {
         'user': user,
         'domain': current_site,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
