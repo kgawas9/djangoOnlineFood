@@ -9,7 +9,8 @@ from .models import User, UserProfile
 from .forms import UserForm
 from vendor.forms import VendorForm
 from .utils import detectUser, send_verification_email
-from .decorators import is_role_vendor, is_role_customer
+from .decorators import is_role_vendor, is_role_customer, is_admin_user
+from vendor.models import Vendor
 
 
 # Create your views here.

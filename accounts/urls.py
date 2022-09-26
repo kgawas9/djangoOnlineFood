@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
+    path('', views.my_account, name='account'),
     path('register-user/', views.register_user, name='register_user'),
     path('register-vendor/', views.register_vendor, name='register_vendor'),
     
@@ -10,8 +11,11 @@ urlpatterns = [
 
     path('my-account/', views.my_account, name='my_account'),
     path('customer_dashboard/', views.customer_dashboard, name='customer_dashboard'),
-    path('vendor_dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
 
+
+    # vendor
+    path('vendor_dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
+    path('vendor/', include('vendor.urls')),
 
     # email verification
     path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),

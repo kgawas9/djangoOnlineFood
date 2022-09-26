@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 # ----------------------------
 
 from . import views
+from accounts.decorators import is_admin_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),

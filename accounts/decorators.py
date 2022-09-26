@@ -13,3 +13,10 @@ def is_role_customer(user):
         return True
     else:
         raise PermissionDenied
+
+
+def is_admin_user(user):
+    if user.is_admin:
+        return True
+    else:
+        raise PermissionDenied
