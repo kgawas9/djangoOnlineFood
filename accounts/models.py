@@ -120,8 +120,8 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True)
     cover_photo = models.ImageField(upload_to='users/cover_photoes', blank=True, null=True)
 
-    address_line_1 = models.CharField(max_length=50, blank=True, null=True)
-    address_line_2 = models.CharField(max_length=50, blank=True, null=True)
+    address = models.CharField(max_length=500, blank=True, null=True)
+    # address_line_2 = models.CharField(max_length=50, blank=True, null=True)
     
     country = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=100, blank=True, null=True)
@@ -138,7 +138,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.email
 
-    def full_address(self):
-        return f'{self.address_line_1}, {self.address_line_2}, {self.city}'
+    # def full_address(self):
+    #     return f'{self.address_line_1}, {self.address_line_2}, {self.city}'
 
 

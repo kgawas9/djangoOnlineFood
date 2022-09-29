@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
 from accounts.models import UserProfile
+from accounts.decorators import is_role_vendor
 from .models import Vendor
 from .forms import VendorForm
 from accounts.forms import UserProfileForm
@@ -12,6 +13,7 @@ from accounts.forms import UserProfileForm
 
 # Create your views here.
 @login_required(login_url='login')
+@user_passes_test(is_role_vendor)
 def vendor_profile(request):
     profile = get_object_or_404(UserProfile, user = request.user)
     vendor = get_object_or_404(Vendor, user = request.user)
