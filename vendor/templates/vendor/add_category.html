@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+    <!-- Main Section Start -->
+    <div class="main-section">
+        <!-- cover page -->
+        {% include 'includes/cover.html' %}
+
+        <div class="page-section account-header buyer-logged-in">
+            <div class="container">
+                <div class="row">
+                    <!-- sidebar code -->
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        {% include 'includes/v_sidebar.html' %}
+                    </div>
+                    
+                    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                        <div class="user-dashboard loader-holder">
+                            <div class="user-holder">
+                                
+                                <!-- manage restaurant -->
+                                <h5 class="text-uppercase">Build Your Menu</h5>
+									<!-- My Restaurants Form Start -->
+                                    <hr>
+                                    <h6>Add New Category</h6>
+                                    
+                                    <!-- <a href="#" class="btn btn-success float-right m-1"><i class="fa fa-plus" aria-hidden="true"></i> Add Items</a> -->
+
+                                    
+									<form action="{% url 'add_category' %}" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+										<div class="form-fields-set">
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                    <div class="field-holder">
+                                                        <label>Category Name <span class="text-danger">*</span></label>
+                                                        {{ cat_form.category_name }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                    <div class="field-holder">
+                                                        <label>Description</label>
+                                                        {{ cat_form.description }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% for field in cat_form %}
+                                            {% if field.errors %}
+                                                {% for error in field.errors %}
+                                                    <li class="text-danger my-3">{{ error }}</li>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        <button type="submit" class="btn btn-info"><i class="fa fa-check" aria-hidden="true"></i>&nbsp Create</button>
+									</form>
+									<!-- My Restaurants Form End -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Section End -->
+
+    <!-- Load messages -->
+    {% include 'includes/alerts.html' %}
+{% endblock content %}
