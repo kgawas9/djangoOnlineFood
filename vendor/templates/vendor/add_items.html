@@ -23,29 +23,62 @@
                                 <h5 class="text-uppercase">Build Your Menu<button class="btn btn-secondary float-right" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i>&nbsp Back</button></h5>
 									<!-- My Restaurants Form Start -->
                                     <hr>
-                                    <h6>Modify Category</h6>
+                                    <h6>Add New Item</h6>
                                     
                                     <!-- <a href="#" class="btn btn-success float-right m-1"><i class="fa fa-plus" aria-hidden="true"></i> Add Items</a> -->
 
                                     
-									<form action="{% url 'edit_category' category.id %}" method="POST">
+									<form action="{% url 'add_food_items' %}" method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
 										<div class="form-fields-set">
                                             <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                                     <div class="field-holder">
                                                         <label>Category Name <span class="text-danger">*</span></label>
-                                                        {{ cat_form.category_name }}
+                                                        {{ item_form.category }}
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-12 col-md-12 col-sm-12">
+
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="field-holder">
+                                                        <label>Title <span class="text-danger">*</span></label>
+                                                        {{ item_form.food_title }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <div class="field-holder">
                                                         <label>Description</label>
-                                                        {{ cat_form.description }}
+                                                        {{ item_form.description }}
                                                     </div>
                                                 </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                                    <div class="field-holder">
+                                                        <label>Price <span class="text-danger">*</span></label>
+                                                        {{ item_form.price }}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                                                    <div class="field-holder">
+                                                        <label>Is available <span class="text-danger">*</span></label>
+                                                        {{ item_form.is_available }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                    <div class="text-holder">
+                                                        <label>Upload image</label>
+                                                        <div class="field-holder">
+                                                            {{ item_form.image }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
                                         </div>
+                                        
                                         
                                         {% for field in cat_form %}
                                             {% if field.errors %}
@@ -55,7 +88,7 @@
                                             {% endif %}
                                         {% endfor %}
 
-                                        <button type="submit" class="btn btn-info"><i class="fa fa-check" aria-hidden="true"></i>&nbsp Update</button>
+                                        <button type="submit" class="btn btn-info"><i class="fa fa-check" aria-hidden="true"></i>&nbsp Add</button>
 									</form>
 									<!-- My Restaurants Form End -->
                             </div>
