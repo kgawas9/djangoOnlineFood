@@ -56,6 +56,7 @@
                                         {% endfor %}
 
                                         <button type="submit" class="btn btn-info"><i class="fa fa-check" aria-hidden="true"></i>&nbsp Update</button>
+                                        <a href="{% url 'delete_category' category.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{category}}?')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Delete</a>
 									</form>
 									<!-- My Restaurants Form End -->
                             </div>

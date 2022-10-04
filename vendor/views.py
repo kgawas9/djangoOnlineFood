@@ -209,3 +209,14 @@ def edit_food_item(request, pk=None):
         'food_item': food_item,
     }
     return render(request, 'vendor/edit_items.html', context=context)
+
+
+
+@login_required(login_url='login')
+@user_passes_test(is_role_vendor)
+def delete_food_item(request, pk=None):
+    food_item = get_object_or_404(FoodItem, pk=pk)
+    food_item.delete()
+    messages.success(request, f"{food_item} successfully deleted..")
+    return redirect('fooditems_by_category', food_item.category.id)
+
