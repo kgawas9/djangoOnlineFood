@@ -177,6 +177,8 @@ def add_food_items(request):
             return redirect('fooditems_by_category', fooditem.category.id)
 
     item_form = ItemForm()
+    item_form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
+
     context = {
         'item_form': item_form,
     }
@@ -203,6 +205,8 @@ def edit_food_item(request, pk=None):
 
     else:
         food_item_form = ItemForm(instance=food_item)
+        # to add filter
+        food_item_form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
 
     context = {
         'item_form': food_item_form,
