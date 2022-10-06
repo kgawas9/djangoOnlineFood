@@ -16,3 +16,7 @@ class VendorAdmin(admin.ModelAdmin):
         'is_approved'
     ]
 
+    prepopulated_fields= {
+        'vendor_slug':('vendor_name',)
+    }
+

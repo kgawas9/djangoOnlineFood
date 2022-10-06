@@ -3,6 +3,7 @@ from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from django.template.defaultfilters import slugify
 
 # custom models
 from .models import User, UserProfile
@@ -74,8 +75,12 @@ def register_user(request):
 
 def register_vendor(request):
     if request.user.is_authenticated:
+        # if request.user.role == 'vendor':
         messages.warning(request, "You are already logged in..")
         return redirect('my_account')
+        # else:
+        #     logout(request)
+        #     return redirect('register_vendor')
 
     if request.method == 'POST':
         user_form = UserForm(request.POST)
@@ -83,6 +88,7 @@ def register_vendor(request):
         vendor_form = VendorForm(request.POST, request.FILES)
 
         if user_form.is_valid() and vendor_form.is_valid():
+            vendor_name = vendor_form.cleaned_data['vendor_name']
             user = user_form.save(commit=False)
             
             # password = user_form.cleaned_data['password']
@@ -97,6 +103,7 @@ def register_vendor(request):
             vendor.user = user
             user_profile = UserProfile.objects.get(user = user)
             vendor.user_profile = user_profile
+            vendor.vendor_slug = slugify(vendor_name) + "-" + str(user.id)
             vendor.save()
 
             # Send verification email

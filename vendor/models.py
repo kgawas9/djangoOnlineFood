@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 from accounts.models import User, UserProfile
 
@@ -9,6 +10,7 @@ class Vendor(models.Model):
     user_profile = models.OneToOneField(UserProfile, related_name = 'user_profile', on_delete = models.CASCADE)
 
     vendor_name = models.CharField(max_length=100)
+    vendor_slug = models.SlugField(max_length = 100, unique=True)
     vendor_license = models.ImageField(upload_to='vendor/license', null = True, blank = True)
     is_approved = models.BooleanField(default=False)
     
@@ -29,17 +31,26 @@ class Vendor(models.Model):
                 else:
                     # send notification email
                     mail_subject = 'We are sorry! You are not eligible for publishing your food menu on our marketplace.'
+
+                mail_template = 'accounts/emails/admin_approval_email.html'
+                context = {
+                    'user': self.user,
+                    'is_approved': self.is_approved,
+                }
+                send_vendor_notification(mail_subject, mail_template, context)
             
             else:
                 if self.is_approved == False:
                     mail_subject = 'foodOnline - Eligibility Criteria Failed'
+                else:
+                    mail_subject = 'Modification in vendor model'
 
             
-            mail_template = 'accounts/emails/admin_approval_email.html'
-            context = {
-                'user': self.user,
-                'is_approved': self.is_approved,
-            }
-            send_vendor_notification(mail_subject, mail_template, context)
+                mail_template = 'accounts/emails/admin_approval_email.html'
+                context = {
+                    'user': self.user,
+                    'is_approved': self.is_approved,
+                }
+                send_vendor_notification(mail_subject, mail_template, context)
 
         return super(Vendor, self).save(*args, **kwargs)
