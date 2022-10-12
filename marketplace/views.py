@@ -145,3 +145,12 @@ def decrease_item_from_cart(request, food_id):
             'status':'login_required',
             'message':'Please login to continue'
         })
+
+
+def cart(request):
+    cart_items = Cart.objects.filter(user = request.user)
+    context = {
+        'cart_items': cart_items,
+    }
+    return render(request, 'marketplace/cart.html', context=context)
+    
