@@ -77,7 +77,18 @@ function onPlaceChanged (){
 }
 
 
+// To refresh the page on back button
 
+window.addEventListener( "pageshow", function ( event ) {
+    var historyTraversal = event.persisted;
+    if ( historyTraversal ) {
+      // Handle page restore.
+      window.location.reload();
+    }
+  });
+
+//   ( typeof window.performance != "undefined" && 
+//   window.performance.getEntriesByType("navigation")[2].type );
 
 $(document).ready(function(){
     $('.add_to_cart').on('click', function(e){
@@ -155,8 +166,10 @@ $(document).ready(function(){
                 // console.log(response);
                 if (response.status == 'login_required'){
                     swal(
-                        'title', 'subtitle', 'info'
-                    )
+                        response.message, '', 'info'
+                    ).then(function(){
+                        window.location = '/login/';
+                    })
                 }if (response.status == 'failed'){
                     swal(
                         response.message, '', 'error'

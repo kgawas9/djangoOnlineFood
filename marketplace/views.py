@@ -46,7 +46,6 @@ def vendor_details(request, vendor_slug):
 
 
 
-@login_required(login_url='login')
 def add_to_cart(request, food_id=None):
     if request.user.is_authenticated:
         # below check condition is depricated after django 4.0 release
@@ -107,7 +106,7 @@ def add_to_cart(request, food_id=None):
                             'message': 'Please login to continue'})
 
 
-@login_required(login_url='login')
+
 def decrease_item_from_cart(request, food_id):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
