@@ -7,7 +7,7 @@ from django.db.models import Prefetch
 from vendor.models import Vendor
 from menu.models import Category, FoodItem
 from .models import Cart
-from .context_processors import get_cart_counter
+from .context_processors import get_cart_counter, get_cart_amount
 
 # Create your views here.
 
@@ -46,6 +46,7 @@ def vendor_details(request, vendor_slug):
 
 
 
+@login_required(login_url='login')
 def add_to_cart(request, food_id=None):
     if request.user.is_authenticated:
         # below check condition is depricated after django 4.0 release
@@ -72,6 +73,7 @@ def add_to_cart(request, food_id=None):
                         'message': 'Increased the cart quantity',
                         'cart_counter': get_cart_counter(request),
                         'qty': check_cart.quantity,
+                        'cart_amount': get_cart_amount(request),
                     })
 
                 except:
@@ -86,6 +88,7 @@ def add_to_cart(request, food_id=None):
                         'message': 'Added the cart quantity',
                         'cart_counter': get_cart_counter(request),
                         'qty': check_cart.quantity,
+                        'cart_amount': get_cart_amount(request),
                     })
 
             except:
@@ -104,7 +107,7 @@ def add_to_cart(request, food_id=None):
                             'message': 'Please login to continue'})
 
 
-
+@login_required(login_url='login')
 def decrease_item_from_cart(request, food_id):
     if request.user.is_authenticated:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -126,6 +129,7 @@ def decrease_item_from_cart(request, food_id):
                         'message':'Requested food item decreased from cart',
                         'cart_counter': get_cart_counter(request),
                         'qty': check_cart.quantity,
+                        'cart_amount': get_cart_amount(request),
                     })
 
                 except:
@@ -133,6 +137,7 @@ def decrease_item_from_cart(request, food_id):
                         'status':'failed',
                         'message':f'{food_item} does not exist in cart',
                         'cart_counter': get_cart_counter(request),
+                        'cart_amount': get_cart_amount(request),
                     })
             except:
                 return JsonResponse({
@@ -147,10 +152,73 @@ def decrease_item_from_cart(request, food_id):
         })
 
 
+@login_required(login_url='login')
 def cart(request):
-    cart_items = Cart.objects.filter(user = request.user)
+    cart_items = Cart.objects.filter(user = request.user).order_by('created_at')
     context = {
         'cart_items': cart_items,
+        'cart_amount': get_cart_amount(request),
     }
     return render(request, 'marketplace/cart.html', context=context)
-    
+
+
+# ===============================================
+# another approach to delete the cart item based on food_item id
+# @login_required(login_url='login')
+# def delete_cart_item(request, food_id):
+#     if request.user.is_authenticated:
+#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+#             try:
+#                 food_item = FoodItem.objects.get(id=food_id)
+#                 try:
+#                     cart_item = Cart.objects.get(food_item=food_item, user=request.user)
+
+#                     return JsonResponse({
+#                         'status': 'Success',
+#                         'message': f'{ cart_item.food_item } successfully deleted from cart',    
+#                     })
+#                 except:
+#                     return JsonResponse({
+#                     'status': 'Failed',
+#                     'message': 'food item does not found in cart',
+#                 })    
+#             except:
+#                 return JsonResponse({
+#                     'status': 'Failed',
+#                     'message': 'food item does not exist',
+#                 })
+#         else:
+#             return JsonResponse({
+#                     'status': 'Failed',
+#                     'message': 'Invalid request',
+#                 })
+# end another approach to delete the cart item based on food_item id
+
+@login_required(login_url='login')
+def delete_cart(request, cart_id):
+    if request.user.is_authenticated:
+        # check for ajax request
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            try:
+                cart_item = Cart.objects.get(user = request.user, id = cart_id)
+                if cart_item:
+                    cart_item.delete()
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'{ cart_item.food_item.food_title } successfully deleted',
+                        'cart_counter': get_cart_counter(request),
+                        'qty': cart_item.quantity,
+                        'cart_amount': get_cart_amount(request),
+                    })
+
+            except:
+                return JsonResponse({
+                    'status': 'failed',
+                    'message': 'This item does not exist in cart',
+                })
+        else:
+            return JsonResponse({
+                    'status': 'Failed',
+                    'message': 'Invalid request',
+                })
+
