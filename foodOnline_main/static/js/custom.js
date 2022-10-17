@@ -20,7 +20,7 @@ function onPlaceChanged (){
         document.getElementById('id_address').placeholder = "Start typing...";
     }
     else{
-        console.log('place name=>', place.name)
+        // console.log('place name=>', place.name)
     }
     // get the address components and assign them to the fields
 
@@ -83,7 +83,9 @@ window.addEventListener( "pageshow", function ( event ) {
     var historyTraversal = event.persisted;
     if ( historyTraversal ) {
       // Handle page restore.
-      window.location.reload();
+      if (this.window.location.href.indexOf("marketplace") > -1){
+            window.location.reload();
+      }
     }
   });
 

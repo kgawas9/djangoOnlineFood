@@ -221,3 +221,16 @@ def delete_cart(request, cart_id):
                     'message': 'Invalid request',
                 })
 
+
+
+def search(request):
+    address = request.GET['address']
+    restaurant_name = request.GET['restaurant_name']
+    latitude = request.GET['lat']
+    longitude = request.GET['lng']
+    radius = request.GET['radius']
+
+    print(address, restaurant_name, latitude, longitude, radius)
+
+    return render(request, 'marketplace/listing.html')
+
