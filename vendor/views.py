@@ -101,9 +101,12 @@ def add_category(request):
 
             category = category_form.save(commit=False)
             category.vendor = get_vendor(request)
-            category.slug = slugify(category_name)
 
-            category_form.save()
+            category.save()     # Id will be get generated
+            category.slug = slugify(category_name) + '-' + str(category.id)
+
+            category.save()
+
             messages.success(request, "Category successfully added")
             return redirect('menu_builder')
         else:
@@ -170,9 +173,11 @@ def add_food_items(request):
             food_title = item_form.cleaned_data['food_title']
             fooditem = item_form.save(commit=False)
             fooditem.vendor = get_vendor(request)
-            fooditem.slug = slugify(food_title)
-
-            item_form.save()
+            
+            fooditem.save()
+            fooditem.slug = slugify(food_title) + '-' + str(fooditem.id)
+            fooditem.save()
+            
             messages.success(request, f'{food_title} successfully added into database')
             return redirect('fooditems_by_category', fooditem.category.id)
 
