@@ -225,12 +225,25 @@ def delete_cart(request, cart_id):
 
 def search(request):
     address = request.GET['address']
-    restaurant_name = request.GET['restaurant_name']
+    keyword = request.GET['keyword']
     latitude = request.GET['lat']
     longitude = request.GET['lng']
     radius = request.GET['radius']
 
-    print(address, restaurant_name, latitude, longitude, radius)
+    print(address, keyword, latitude, longitude, radius)
 
-    return render(request, 'marketplace/listing.html')
+    # Get vendor ids that has the food item which user is looking for
+
+    fetch_vendors_by_food_items = FoodItem.objects.filter(food_title__icontains = keyword, is_available = True).values_list('vendor', flat=True)
+    print(fetch_vendors_by_food_items)
+
+    vendors = Vendor.objects.filter(vendor_name__icontains = keyword, is_approved = True, user__is_active =True)
+    vendor_count = vendors.count()
+
+    context = {
+        'vendor_list': vendors,
+        'vendor_count': vendor_count,
+    }
+
+    return render(request, 'marketplace/listing.html', context= context)
 
