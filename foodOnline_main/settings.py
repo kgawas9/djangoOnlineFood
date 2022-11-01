@@ -173,3 +173,11 @@ DEFAULT_FROM_EMAIL = 'foodOnline Marketplace'
 
 # Google API Key
 GOOGLE_API_KEY = config('GOOGLE_API_KEY')
+
+
+# GeoDjango and GDAL settings
+# refer osgeo folder from virtual env and lib ->site packages
+
+os.environ['PATH'] = os.path.join(BASE_DIR, 'envFood\Lib\site-packages\osgeo') + ';' + os.environ['PATH']
+os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'envFood\Lib\site-packages\osgeo\data\proj') + ';' + os.environ['PATH']
+GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'envFood\Lib\site-packages\osgeo\gdal304.dll')
