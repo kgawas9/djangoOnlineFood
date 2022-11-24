@@ -171,6 +171,8 @@ media/
 requirements.txt
 accounts/middleware.py
 
+envOnlineFood/
+
 favicon.ico
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
