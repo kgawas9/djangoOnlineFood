@@ -1,5 +1,5 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch, Q
 
@@ -9,6 +9,12 @@ from vendor.models import Vendor
 from menu.models import Category, FoodItem
 from .models import Cart
 from .context_processors import get_cart_counter, get_cart_amount
+
+
+# distance calculation
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D # 'D is shortcut for distance
+from django.contrib.gis.db.models.functions import Distance
 
 # Create your views here.
 
@@ -225,6 +231,9 @@ def delete_cart(request, cart_id):
 
 
 def search(request):
+    if not 'address' in request.GET:
+        return redirect('marketplace')
+    
     address = request.GET['address']
     keyword = request.GET['keyword']
     latitude = request.GET['lat']
@@ -238,11 +247,23 @@ def search(request):
     fetch_vendors_by_food_items = FoodItem.objects.filter(food_title__icontains = keyword, is_available = True).values_list('vendor', flat=True)
     
     vendors = Vendor.objects.filter(Q(id__in=fetch_vendors_by_food_items) | Q(vendor_name__icontains = keyword, is_approved = True, user__is_active =True))
+
+    if latitude and longitude and radius:
+        pnt = GEOSGeometry('POINT(%s %s)' %(longitude, latitude))
+
+        vendors = Vendor.objects.filter(Q(id__in=fetch_vendors_by_food_items) | Q(vendor_name__icontains = keyword, is_approved = True, user__is_active =True), 
+                                            user_profile__location__distance_lte=(pnt, D(km=radius))
+                                            ).annotate(distance=Distance("user_profile__location", pnt)).order_by("distance")
+
+        for v in vendors:
+            v.kms = round(v.distance.km,2)
+
     vendor_count = vendors.count()
     
     context = {
         'vendor_list': vendors,
         'vendor_count': vendor_count,
+        'source_location': address,
     }
 
     return render(request, 'marketplace/listing.html', context= context)
