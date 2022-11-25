@@ -145,6 +145,11 @@
 											{% if vendor.user_profile.city and vendor.user_profile.state and vendor.user_profile.pin_code %}
 												<address> <span>Type of food : </span> {{ vendor.user_profile.city }}, {{ vendor.user_profile.state }}, {{ vendor.user_profile.pin_code }}</address>
 											{% endif %}
+
+											{% if vendor.kms %}
+												<hr>
+												<span><small><b>{{ vendor.kms }}</b> away from your location</small></span>
+											{% endif %}
 										</div>
 										
 									</div>
