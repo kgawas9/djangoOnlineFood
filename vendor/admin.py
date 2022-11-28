@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Vendor
+from .models import Vendor, OpeningHour
 
 # Register your models here.
 @admin.register(Vendor)
@@ -19,4 +19,11 @@ class VendorAdmin(admin.ModelAdmin):
     prepopulated_fields= {
         'vendor_slug':('vendor_name',)
     }
+
+
+@admin.register(OpeningHour)
+class OpeningHourAdmin(admin.ModelAdmin):
+    list_display= [
+        'vendor', 'day', 'from_hour', 'to_hour'
+    ]
 
