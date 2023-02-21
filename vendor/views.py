@@ -252,7 +252,6 @@ def add_opening_hours(request):
             to_hour = request.POST.get('to_hour')
             is_closed = request.POST.get('is_closed')
 
-            print(day, from_hour, to_hour, is_closed)
             try:
                 hour = OpeningHour.objects.create(
                     vendor = get_vendor(request),
@@ -275,7 +274,7 @@ def add_opening_hours(request):
             except IntegrityError as e:
                 response = {
                     "status": "failed",
-                    "message": "Error occured.\n" + str(e),
+                    "message": "Error occured.\n" + from_hour + "-" + to_hour + ' already exists for this day.',
                 }
 
             return JsonResponse(response)
@@ -284,3 +283,23 @@ def add_opening_hours(request):
             return HttpResponse('Invalid request')
 
     return HttpResponse('Invalid request')
+
+
+def remove_opening_hours(request, pk=None):
+    if request.user.is_authenticated:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'GET':
+            hour = get_object_or_404(OpeningHour, pk=pk)
+
+            if hour:
+                hour.delete()
+                response = {
+                    'status': 'success',
+                    'id': pk,
+                    'message': 'Data removed'
+                }
+            else:
+                response = {
+                    'status': 'error',
+                    'message': 'Unable to find requested data'
+                }
+            return JsonResponse(response)

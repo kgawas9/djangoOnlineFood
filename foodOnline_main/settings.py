@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -87,6 +87,12 @@ WSGI_APPLICATION = 'foodOnline_main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# print(config('DB_NAME'),
+#         config('DB_USER'),
+#         config('DB_PASSWORD'),
+#         config('DB_HOST'),)
+
+
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.postgresql',
@@ -95,6 +101,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
+        'PORT': 5432,
     }
 }
 
@@ -163,6 +170,7 @@ MESSAGE_TAGS = {
 }
 
 
+# CSRF_TRUSTED_ORIGINS = ['https://2040-103-134-161-109.in.ngrok.io/register-user/']
 
 # SMPT configuration details
 EMAIL_HOST = 'smtp.gmail.com'
