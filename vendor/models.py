@@ -4,7 +4,7 @@ from accounts.models import User, UserProfile
 
 from accounts.utils import send_vendor_notification
 
-from datetime import time
+from datetime import time, date, datetime
 
 # Create your models here.
 class Vendor(models.Model):
@@ -21,6 +21,24 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+
+    def is_open(self):
+        todays_date = date.today()
+        today = todays_date.isoweekday()
+        current_opening_hour = OpeningHour.objects.filter(vendor = self, day=today)
+
+        current_time = datetime.now().strftime("%H:%M:%S")
+
+        is_open = False
+        for cur_op_hr in current_opening_hour:
+            start_time = str(datetime.strptime(cur_op_hr.from_hour, "%I:%M %p").time())
+            end_time = str(datetime.strptime(cur_op_hr.to_hour, "%I:%M %p").time())
+            
+            if current_time > start_time and current_time < end_time:
+                is_open = True
+                break
+        
+        return is_open
 
     def save(self, *args, **kwargs):
         # to identify if update is happening or not
