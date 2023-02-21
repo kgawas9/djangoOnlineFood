@@ -3,9 +3,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch, Q
 
+from datetime import date, datetime
 
-
-from vendor.models import Vendor
+from vendor.models import Vendor, OpeningHour
 from menu.models import Category, FoodItem
 from .models import Cart
 from .context_processors import get_cart_counter, get_cart_amount
@@ -38,6 +38,23 @@ def vendor_details(request, vendor_slug):
         )
     )
 
+    opening_hours = OpeningHour.objects.filter(vendor=vendor).order_by('day', 'from_hour')
+
+    todays_date = date.today()
+    today = todays_date.isoweekday()
+    current_opening_hour = OpeningHour.objects.filter(vendor = vendor, day=today)
+
+    current_time = datetime.now().strftime("%H:%M:%S")
+    
+    is_open = False
+    for cur_op_hr in current_opening_hour:
+        start_time = str(datetime.strptime(cur_op_hr.from_hour, "%I:%M %p").time())
+        end_time = str(datetime.strptime(cur_op_hr.to_hour, "%I:%M %p").time())
+
+        if current_time > start_time and current_time < end_time:
+            is_open = True
+            break
+    
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
     else:
@@ -47,6 +64,9 @@ def vendor_details(request, vendor_slug):
         'vendor': vendor,
         'category_details': categories,
         'cart_items': cart_items,
+        'opening_hours': opening_hours,
+        'current_opening_hour': current_opening_hour,
+        'is_open': is_open,
     }
 
     return render(request, 'marketplace/vendor_detail.html', context=context)
