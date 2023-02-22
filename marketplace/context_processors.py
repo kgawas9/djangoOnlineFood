@@ -39,7 +39,7 @@ def get_cart_amount(request):
             tax_amt = round((tax_per * subtotal)/100, 2)
 
             # print(tax_type, tax_per, tax_amt)
-            tax_dict.update({tax_type: {tax_per : tax_amt}})
+            tax_dict.update({tax_type: {str(tax_per) : tax_amt}})
 
         # for key in tax_dict.values():
         #     for val in key.values():
@@ -49,4 +49,7 @@ def get_cart_amount(request):
         tax = sum(val for key in tax_dict.values() for val in key.values())
         total = subtotal + tax
 
-    return dict(subtotal = subtotal, tax = tax, total = total)
+        # print(tax_dict)
+        # check for how to pass tax_dict details
+    return dict(subtotal=subtotal, tax=tax, total=total, tax_dict=tax_dict)
+
