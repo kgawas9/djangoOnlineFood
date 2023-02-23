@@ -131,7 +131,7 @@ $(document).ready(function(){
 
                     cart_amounts(
                         response.cart_amount['subtotal'],
-                        response.cart_amount['tax'],
+                        response.cart_amount['tax_dict'],
                         response.cart_amount['total'],
                     )
                 }
@@ -197,7 +197,7 @@ $(document).ready(function(){
 
                     cart_amounts(
                         response.cart_amount['subtotal'],
-                        response.cart_amount['tax'],
+                        response.cart_amount['tax_dict'],
                         response.cart_amount['total'],
                     )
                 }   
@@ -244,7 +244,7 @@ $(document).ready(function(){
 
                     cart_amounts(
                         response.cart_amount['subtotal'],
-                        response.cart_amount['tax'],
+                        response.cart_amount['tax_dict'],
                         response.cart_amount['total'],
                     )
                 }   
@@ -270,11 +270,19 @@ $(document).ready(function(){
 
     // function to read cart amounts
 
-    function cart_amounts(subtotal, tax, total){
+    function cart_amounts(subtotal, tax_dict, total){
         if (window.location.pathname == '/cart/'){
             $('#subtotal').html(subtotal);
-            $('#tax').html(tax);
+            // $('#tax').html(tax);
             $('#total').html(total);
+
+            for(key1 in tax_dict){
+                console.log(tax_dict[key1])
+                for(key2 in tax_dict[key1]){
+                    // console.log(tax_dict[key1][key2])
+                    $('#tax-'+key1).html(tax_dict[key1][key2])
+                }
+            }
         }
     }
 
