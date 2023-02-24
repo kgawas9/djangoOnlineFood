@@ -7,7 +7,13 @@ from datetime import date, datetime
 
 from vendor.models import Vendor, OpeningHour
 from menu.models import Category, FoodItem
+from marketplace.models import Cart
+from accounts.models import UserProfile, User
+
 from .models import Cart
+
+from orders.forms import OrderForm
+
 from .context_processors import get_cart_counter, get_cart_amount
 
 
@@ -288,6 +294,31 @@ def search(request):
     return render(request, 'marketplace/listing.html', context= context)
 
 
-
+@login_required(login_url='login')
 def checkout(request):
-    return render(request, 'marketplace/checkout.html')
+    cart_items = Cart.objects.filter(user = request.user).order_by('created_at')
+    
+    if cart_items.count() <= 0:
+        return redirect('marketplace')
+    
+    user_profile = UserProfile.objects.get(user=request.user)
+    default_values = {
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'phone': request.user.phone_number,
+        'email': request.user.email,
+        'address': user_profile.address,
+        'country': user_profile.country,
+        'city': user_profile.city,
+        'state': user_profile.state,
+        'pin_code': user_profile.pin_code
+    }
+    
+    order_form = OrderForm(initial=default_values)
+    
+    context = {
+        'order_form': order_form,
+        'cart_items':  cart_items,
+    }
+
+    return render(request, 'marketplace/checkout.html', context=context)
