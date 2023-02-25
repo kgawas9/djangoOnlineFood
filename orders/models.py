@@ -63,8 +63,8 @@ class OrderedFood(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
     fooditem = models.ForeignKey(FoodItem, on_delete=models.CASCADE)
+    
     quantity = models.IntegerField()
     price = models.FloatField()
     amount = models.FloatField()

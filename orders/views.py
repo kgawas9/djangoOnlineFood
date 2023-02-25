@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from marketplace.models import Cart
 from marketplace.context_processors import get_cart_amount
 
 from .forms import OrderForm
-from .models import Order
+from .models import Order, Payment, OrderedFood
 from .utils import generate_order_number
 
 import simplejson as json
@@ -50,9 +51,79 @@ def place_order(request):
             order.save()
             order.order_number = generate_order_number(order.id)
             order.save()
-            return redirect('place_order')
+            context = {
+                'order': order,
+                'cart_items': cart_items,
+            }
+            return render(request, 'orders/place_order.html', context=context)
         else:
             print(form.errors)
 
-
+    # context = {
+    #             'order': None,
+    #             'cart_items': cart_items,
+    #         }
     return render(request, 'orders/place_order.html')
+
+
+@login_required(login_url='login')
+def order_payments(request):
+    # check if the request is ajax
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.method == 'POST':
+        # store the payment detail in  payment table (database)
+        order_number = request.POST.get('order_number')
+        transaction_id = request.POST.get('transaction_id')
+        payment_method = request.POST.get('payment_method')
+        status = request.POST.get('status')
+
+        # ============================================================
+        # if value does not found in post it will return key error with below approach, however
+        # it does works the same
+        # status = request.POST['status']   
+        # ============================================================
+
+        # update payment
+        order = Order.objects.get(user=request.user, order_number = order_number)
+        payment = Payment(
+            user = request.user,
+            transaction_id = transaction_id,
+            payment_method = payment_method,
+            amount = order.total,
+            status = status.lower()
+        )
+
+        payment.save()
+
+        # update order model
+        
+        order.Payment = payment
+        order.is_ordered = True
+        order.save()
+
+        # move the cart items to ordered food model
+        cart_items = Cart.objects.filter(user=request.user)
+        for item in cart_items:    
+            ordered_food = OrderedFood(
+                order = order,
+                payment = payment,
+                user = request.user,
+                fooditem = item.food_item,
+
+                quantity = item.quantity,
+                price = item.food_item.price,
+                amount = item.food_item.price * item.quantity,        # to calculate total amount
+            )
+
+            ordered_food.save()
+
+        HttpResponse('Saved ordered food')
+
+
+        # send order confirmation email to customer
+
+        # send order received email to vendor
+
+        # clear the cart if payment is success
+
+        # return back to ajax with the status success or failure
+    return HttpResponse("payments view")
