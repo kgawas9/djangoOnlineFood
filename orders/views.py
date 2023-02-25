@@ -24,7 +24,7 @@ def place_order(request):
     grand_total = get_cart_amount(request)['total']
     tax_data = get_cart_amount(request)['tax_dict']
 
-    print(json.dumps(tax_data))
+    # print(json.dumps(tax_data))
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
