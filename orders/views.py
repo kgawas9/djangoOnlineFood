@@ -9,6 +9,8 @@ from .forms import OrderForm
 from .models import Order, Payment, OrderedFood
 from .utils import generate_order_number
 
+from accounts.utils import send_notification
+
 import simplejson as json
 
 # Create your views here.
@@ -116,11 +118,17 @@ def order_payments(request):
 
             ordered_food.save()
 
-        HttpResponse('Saved ordered food')
-
-
         # send order confirmation email to customer
+        mail_subject = 'Order confirmed - ' 
+        mail_template = 'orders/emails/order_confirmation_email.html'
+        context = {
+            'user': request.user,
+            'order': order,
+            'to_email': order.email,
+        }
 
+        send_notification(mail_subject, mail_template, context)
+        return HttpResponse('Data saved and email sent')
         # send order received email to vendor
 
         # clear the cart if payment is success
