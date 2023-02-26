@@ -119,7 +119,7 @@ def order_payments(request):
             ordered_food.save()
 
         # send order confirmation email to customer
-        mail_subject = 'Order confirmed - ' 
+        mail_subject = 'Order confirmed - ' + str(order_number)
         mail_template = 'orders/emails/order_confirmation_email.html'
         context = {
             'user': request.user,
@@ -128,10 +128,34 @@ def order_payments(request):
         }
 
         send_notification(mail_subject, mail_template, context)
-        return HttpResponse('Data saved and email sent')
+        
         # send order received email to vendor
+        mail_subject = 'New order received '
+        mail_template = 'orders/emails/new_order_received.html'
 
+        to_emails = []
+        for item in cart_items:
+            if item.food_item.vendor.user.email not in to_emails:
+                to_emails.append(item.food_item.vendor.user.email)
+
+        # ===================================================================
+        # to send an individual emails with food item summary to vendor
+        # ordered_food_items = OrderedFood.objects.filter(order=order)
+        # for item in ordered_food_items:
+        #     print(item)
+        # ===================================================================
+
+        context = {
+            'order': order,
+            'to_email': to_emails,
+        }
+
+        send_notification(mail_subject=mail_subject, mail_template=mail_template, context=context)
+        
         # clear the cart if payment is success
+        cart_items.delete()
 
         # return back to ajax with the status success or failure
+        return HttpResponse('success')
+    
     return HttpResponse("payments view")
