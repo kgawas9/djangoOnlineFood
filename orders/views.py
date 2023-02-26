@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from marketplace.models import Cart
@@ -153,9 +153,18 @@ def order_payments(request):
         send_notification(mail_subject=mail_subject, mail_template=mail_template, context=context)
         
         # clear the cart if payment is success
-        cart_items.delete()
+        # cart_items.delete()
 
         # return back to ajax with the status success or failure
-        return HttpResponse('success')
+        return JsonResponse({
+            'order_number': order_number,
+            'transaction_id': transaction_id,
+            'message': 'success'
+            })
     
     return HttpResponse("payments view")
+
+
+@login_required(login_url='login')
+def order_complete(request):
+    return render(request, 'orders/order_complete.html')

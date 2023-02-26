@@ -151,6 +151,7 @@
 
     var total = "{{total}}"
     var url = "{% url 'payments' %}"
+    var order_completed_url = "{% url 'order_complete' %}"
     var order_number = "{{ order.order_number }}"
 
     // above code
@@ -201,7 +202,10 @@
                 'csrfmiddlewaretoken': csrftoken,
             },
             success: function(response){
-                console.log('Response: ', response)
+                if(response.message == 'success'){
+                    console.log('payment successfuly ', response.transaction_id)
+                    window.location.href = order_completed_url + '?order_no='+ response.order_number + '&trans_id='+ response.transaction_id
+                }
             }
         })
     }
