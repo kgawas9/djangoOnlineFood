@@ -98,7 +98,7 @@ def order_payments(request):
 
         # update order model
         
-        order.Payment = payment
+        order.payment = payment
         order.is_ordered = True
         order.save()
 
@@ -153,7 +153,7 @@ def order_payments(request):
         send_notification(mail_subject=mail_subject, mail_template=mail_template, context=context)
         
         # clear the cart if payment is success
-        # cart_items.delete()
+        cart_items.delete()
 
         # return back to ajax with the status success or failure
         return JsonResponse({
@@ -167,4 +167,32 @@ def order_payments(request):
 
 @login_required(login_url='login')
 def order_complete(request):
-    return render(request, 'orders/order_complete.html')
+    order_number = request.GET.get('order_no')
+    transaction_id = request.GET.get('trans_id')
+
+    try:
+        order = Order.objects.get(order_number = order_number, payment__transaction_id =transaction_id, is_ordered=True)
+        ordered_food = OrderedFood.objects.filter(order=order)
+
+        subtotal = 0
+        for item in ordered_food:
+            subtotal += item.price * item.quantity
+
+        tax_data = json.loads(order.tax_data)
+        # print(tax_data)
+
+        context = {
+            'order': order,
+            'ordered_food': ordered_food,
+            'subtotal': subtotal,
+            'tax_data': tax_data
+        }
+        return render(request, 'orders/order_complete.html', context=context)
+
+    except Exception as e:
+        # print('in exception', str(e))
+        return redirect('place_order')
+        
+    
+
+# http://127.0.0.1:8000/orders/order-successful/?order_no=2023022619434165&trans_id=400567559E046321K

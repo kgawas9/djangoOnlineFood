@@ -184,6 +184,11 @@
                 send_transaction(transaction_id, payment_method, status)
                 // console.log(transaction)
                 // alert('Transaction :' + transaction.status + ', \nID: ' + transaction.id +'.')
+
+                const element = document.getElementById('paypal-button-container');
+                element.innerHTML = '';
+                element.innerHTML = '<h5 class = "text-center text-success mt-5"><i class = "fa fa-spinner fa-spin"></i>Your payment is processing, please do not refresh or go back..</h5>';
+
             });
         }
 
